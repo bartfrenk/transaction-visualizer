@@ -4,19 +4,10 @@ import matplotlib.pyplot as plt
 import matplotlib
 from collections import OrderedDict
 
-"""Represents a single transaction category."""
-class Category:
-    def __init__(keywords):
-        self.keywords = keywords
-
-    def count_keywords(label):
-        """Return the number of keywords found in label."""
-        return sum(1 if word in keyword else 0 for keyword in self.keywords)
-
 """Represents in a single transaction in a unified format."""
 class Transaction:
 
-    DISPLAY = "date: %s; src: %s; amount: %f"
+    DISPLAY = "date: %s; src: %s; amount: %f; category: %s"
 
     def __init__(self, date, dest, amount, cat=None):
         self.dest = dest
@@ -25,7 +16,7 @@ class Transaction:
         self.cat = cat
 
     def __str__(self):
-        return Transaction.DISPLAY % (self.date.strftime("%Y-%m-%d"), self.src, self.amount)
+        return Transaction.DISPLAY % (self.date.strftime("%Y-%m-%d"), self.src, self.amount, self.cat)
 
     @staticmethod
     def read(scheme, path, header=True):
@@ -62,8 +53,9 @@ def plot_cumulative_amount(histories, colors=None):
         plt.plot_date(dates, balances[1:], colors[i] + "-")
     plt.show()
 
-def totals_per_month(history):
-    tsm = split(history, lambda t: (t.date.year, t.date.month))
+def summarize(history):
+    """Compute transactions totals per month and category."""
+    tree = split(history, [lambda t: (t.date.year, t.date.month), lambda t: t.cat])
     totm = [(month, total_amount(ts)) for month, ts in tsm.items()]
     totm.sort()
     return OrderedDict(totm)

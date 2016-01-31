@@ -1,7 +1,16 @@
 from transaction import Transaction, plot_cumulative_amount, split, show_total_amount_per_month
 from utils import list_functions
+from collections import OrderedDict
+from categorizer import Categorizer
+
 import sys
 import scheme
+
+CAT = Categorizer([
+    ("child-care", "bla"),
+    ("groceries", ".*[AH|Jumbo].*"),
+    ("misc", ".*")
+])
 
 # TODO: make GUI (using Tkinter?)
 
@@ -24,9 +33,8 @@ def main(argv):
         elif len(schemes) > 1:
             print("Multiple transaction formats might apply to the input.""")
         else:
-            history = Transaction.read(schemes[0], argv[1])
+            history = Transaction.read(schemes[0](CAT), argv[1])
             history.sort(key=lambda t: t.date)
-            show_total_amount_per_month(history)
             plot_cumulative_amount({None: history})
 
 if __name__ == "__main__":
