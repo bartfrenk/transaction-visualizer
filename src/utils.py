@@ -13,11 +13,11 @@ def list_functions(mod):
                         if contains_function(mod, fn)]
 
 def split(xs, fns):
-    """Split xs into a forest
-    The trees in the forest are indexed by the distinct values of
-    the first element of 'fn' on 'xs'. The leaves in those trees
-    are indexed by the values of the second element of 'fn' on 'xs',
-    etc.
+    """Split xs into a forest.
+
+    The trees in the forest are indexed by the distinct values of the
+    first element of 'fn' on 'xs'. The leaves in those trees are
+    indexed by the values of the second element of 'fn' on 'xs', etc.
     """
     if not fns:
         return xs
@@ -29,16 +29,26 @@ def split(xs, fns):
         result[key] = split(xss, tail_fns)
     return result
 
-def aggregate(tree, fns):
-    """
-    tree -
-    fns - functions that transform a list of leafs
-    """
-    pass
+def scan(tree, f, r):
+    """Reduce function value on leaves up the tree.
 
-def test_split():
-    xs = list(permutations(["a", "b", "c", "d"]))
-    print split(xs, [lambda x: x[0], lambda x: x[1]])
+    The value on a leaf is the application of 'f' on that leaf. The
+    value on an inner node is the reduction of the values of its
+    children by 'r'.
+    """
+    if not isinstance(tree, dict):
+        return (f(tree),)
+    else:
+        branches = {node: scan(branch, f, r) for (node, branch) in tree.items()}
+        annotation = reduce(r, map(lambda branch: branch[0], branches.itervalues()))
+        return (annotation, branches)
+
+def test():
+    xs = list(permutations([1, 2, 3, 4]))
+    tree = split(xs, [lambda x: x[0], lambda x: x[1]])
+    plus = lambda x, y: x + y
+    summary = scan(tree, len, plus)
+    print summary
 
 if __name__ == "__main__":
-    test_split()
+    test()
