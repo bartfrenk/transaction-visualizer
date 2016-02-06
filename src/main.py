@@ -6,7 +6,6 @@ from categorizer import Categorizer, contains
 import sys
 import scheme
 
-
 CAT = Categorizer([
     ("child care", contains("Mare Gastouderbureau", "Mare")),
     ("groceries", contains("AH", "Jumbo", "Ekoplaza", "Lidl",
