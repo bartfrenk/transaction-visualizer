@@ -59,15 +59,11 @@ def cumulative_sum(xs, initial=0):
         result.append(result[-1] + x)
     return result
 
-def plot_cumulative_amount(histories, colors=None):
+def get_cumulative_amount(history):
     """Show cumulative transaction totals in plot, one line for each history."""
-    if colors == None:
-        colors = ["r", "b"]
-    for (i, history) in enumerate(histories.itervalues()):
-        balances = cumulative_sum([t.amount for t in history])
-        dates = matplotlib.dates.date2num([t.date for t in history])
-        plt.plot_date(dates, balances[1:], colors[i] + "-")
-    plt.show()
+    balances = cumulative_sum([t.amount for t in history])
+    dates = matplotlib.dates.date2num([t.date for t in history])
+    return (dates, balances[1:])
 
 def print_summary(history, hierarchy):
     """Split transaction summary per month and category."""

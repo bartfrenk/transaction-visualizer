@@ -1,4 +1,4 @@
-from transaction import Transaction, plot_cumulative_amount, print_summary
+from transaction import Transaction, print_summary
 from utils import list_functions
 from collections import OrderedDict
 from categorizer import Categorizer, contains
@@ -31,19 +31,28 @@ CAT = Categorizer([
 # TODO: make GUI (using Tkinter?)
 
 # TODO: this depends too much of the internals of the scheme module
-def derive_schemes(argv):
+def derive_schemes(file_name):
     """Return the schemes that might apply to the arguments."""
-    if len(argv) < 2:
-        return []
-    return [getattr(scheme, name) for name in list_functions(scheme)
-                                  if name in argv[1]]
+    return [getattr(scheme, fn_name) for fn_name in list_functions(scheme)
+                                     if fn_name in file_name]
+
+def open_transaction_file(path):
+    schemes = derive_schemes(path)
+    if (len(schemes) == 0):
+        print "Cannot derive transaction format from input arguments."
+    elif len(schemes) > 1:
+        print "Multiple transaction formats might apply to the input."
+    else:
+        scheme = schemes[0]
+        history = Transaction.read(scheme(CAT), path)
+        return history
 
 def main(argv):
     """Visualize command line specified transaction data."""
     if (len(argv) != 2):
         print "syntax: " + argv[0].split("/")[-1] + " <csv file>"
     else:
-        schemes = derive_schemes(argv)
+        schemes = derive_schemes(argv[1])
         if (len(schemes) == 0):
             print "Cannot derive transaction format from input arguments."
         elif len(schemes) > 1:
